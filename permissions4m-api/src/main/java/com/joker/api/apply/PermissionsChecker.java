@@ -52,7 +52,7 @@ public class PermissionsChecker {
      * @param permission
      * @return true if granted else denied
      */
-    public static boolean isPermissionGranted(Activity activity, String permission) {
+    public static boolean isPermissionGranted(Context activity, String permission) {
         try {
             switch (permission) {
                 case Manifest.permission.READ_CONTACTS:
@@ -124,7 +124,7 @@ public class PermissionsChecker {
      * @param activity
      * @return true if success
      */
-    private static boolean checkRecordAudio(Activity activity) throws Exception {
+    private static boolean checkRecordAudio(Context activity) throws Exception {
         AudioRecordManager recordManager = new AudioRecordManager();
 
         recordManager.startRecord(activity.getExternalFilesDir(Environment.DIRECTORY_RINGTONES) + "/" +
@@ -140,7 +140,7 @@ public class PermissionsChecker {
      * @param activity
      * @return true if success
      */
-    private static boolean checkReadCalendar(Activity activity) throws Exception {
+    private static boolean checkReadCalendar(Context activity) throws Exception {
         Cursor cursor = activity.getContentResolver().query(Uri.parse("content://com" +
                 ".android.calendar/calendars"), null, null, null, null);
         if (cursor != null) {
@@ -157,7 +157,7 @@ public class PermissionsChecker {
      * @param activity
      * @return true if success
      */
-    private static boolean checkWriteCallLog(Activity activity) throws Exception {
+    private static boolean checkWriteCallLog(Context activity) throws Exception {
         ContentResolver contentResolver = activity.getContentResolver();
         ContentValues content = new ContentValues();
         content.put(CallLog.Calls.TYPE, CallLog.Calls.INCOMING_TYPE);
@@ -182,7 +182,7 @@ public class PermissionsChecker {
      * @return true if success
      * @throws Exception
      */
-    private static boolean checkReadSms(Activity activity) throws Exception {
+    private static boolean checkReadSms(Context activity) throws Exception {
         Cursor cursor = activity.getContentResolver().query(Uri.parse("content://sms/"), null, null,
                 null, null);
         if (cursor != null) {
@@ -206,12 +206,13 @@ public class PermissionsChecker {
      * @return true if success
      * @throws Exception
      */
-    private static boolean checkWriteStorage(Activity activity) throws Exception {
+    private static boolean checkWriteStorage(Context activity) throws Exception {
         File file = new File(Environment.getExternalStoragePublicDirectory(
                 Environment.DIRECTORY_PICTURES).getPath(), TAG);
         if (!file.exists()) {
             boolean newFile;
             try {
+                file.getParentFile().mkdirs();
                 newFile = file.createNewFile();
             } catch (IOException e) {
                 e.printStackTrace();
@@ -230,10 +231,11 @@ public class PermissionsChecker {
      * @return true if success
      * @throws Exception
      */
-    private static boolean checkReadStorage(Activity activity) throws Exception {
+    private static boolean checkReadStorage(Context activity) throws Exception {
         File file = new File(Environment.getExternalStoragePublicDirectory(
                 Environment.DIRECTORY_PICTURES).getPath());
-        File[] files = file.listFiles();
+        File[] files = file.getParentFile().listFiles();
+
         return files != null;
     }
 
@@ -245,7 +247,7 @@ public class PermissionsChecker {
      * @return true if success
      * @throws Exception
      */
-    private static boolean checkLocation(Activity activity) throws Exception {
+    private static boolean checkLocation(Context activity) throws Exception {
         granted = false;
         final LocationManager locationManager = (LocationManager) activity.getSystemService(Context
                 .LOCATION_SERVICE);
@@ -292,7 +294,7 @@ public class PermissionsChecker {
      * @return true if success
      * @throws Exception
      */
-    private static boolean checkBodySensors(Activity activity) throws Exception {
+    private static boolean checkBodySensors(Context activity) throws Exception {
         SensorManager sensorManager = (SensorManager) activity.getSystemService(SENSOR_SERVICE);
         Sensor sensor = sensorManager.getDefaultSensor((Sensor.TYPE_ACCELEROMETER));
         SensorEventListener listener = new SensorEventListener() {
@@ -325,7 +327,7 @@ public class PermissionsChecker {
      * @throws Exception
      */
     @SuppressLint("HardwareIds")
-    private static boolean checkReadPhoneState(Activity activity) throws Exception {
+    private static boolean checkReadPhoneState(Context activity) throws Exception {
         TelephonyManager service = (TelephonyManager) activity.getSystemService
                 (TELEPHONY_SERVICE);
         if (PermissionsPageManager.isMEIZU()) {
@@ -345,7 +347,7 @@ public class PermissionsChecker {
      * @return true if success
      * @throws Exception
      */
-    private static boolean checkReadCallLog(Activity activity) throws Exception {
+    private static boolean checkReadCallLog(Context activity) throws Exception {
         Cursor cursor = activity.getContentResolver().query(Uri.parse
                         ("content://call_log/calls"), null, null,
                 null, null);
@@ -371,7 +373,7 @@ public class PermissionsChecker {
      * @return true if success
      * @throws Exception
      */
-    private static boolean checkWriteContacts(Activity activity) throws Exception {
+    private static boolean checkWriteContacts(Context activity) throws Exception {
         if (checkReadContacts(activity)) {
             // write some info
             ContentValues values = new ContentValues();
@@ -413,7 +415,7 @@ public class PermissionsChecker {
      * @return true if success
      * @throws Exception
      */
-    private static boolean checkReadContacts(Activity activity) throws Exception {
+    private static boolean checkReadContacts(Context activity) throws Exception {
         Cursor cursor = activity.getContentResolver().query(ContactsContract.CommonDataKinds.Phone
                 .CONTENT_URI, null, null, null, null);
         if (cursor != null) {
